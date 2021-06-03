@@ -31,6 +31,12 @@ cat > /etc/udev/rules.d/72-static-name.rules <<EOF
 ACTION=="add", SUBSYSTEM=="net", DRIVERS=="brcmfmac", NAME="wlan2"
 EOF
 
+#force the other two wifi cards to be identified as wlan0 and wlan1
+cat > /etc/udev/rules.d/70-persistent-net.rules <<EOF
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="28:f3:66:aa:2c:b3", KERNEL=="wlan*", NAME="wlan0"
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="28:f3:66:aa:1a:7f", KERNEL=="wlan*", NAME="wlan1"
+EOF
+
 #Installing samba to use for network shares
 apt-get install samba samba-common-bin cifs-utils -y
 
@@ -75,5 +81,33 @@ enabled = true
 
 service fail2ban restart
 
+#install the pip python package manager
+apt-get install python-pip -y
+#install the ookla speedtest cli
+pip install
+
+
 #download the pi-wifi project
 #TODO
+cd /var/pi-wifi
+
+#install nodejs
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+source ~/.bashrc
+nvm install 14.17.0
+nvm use 14.17.0
+
+#install node packages
+npm install
+
+#run the server on startup
+sed -i "s/exit 0/cd \/var\/pi-wifi \&\& npm run serve \&\nexit 0/"
+
+#insert a crontab entry to auto-run the web interface on boot
+printf "
+#set the path variable
+PATH=$PATH
+@reboot cd /var/pi-wifi && npm run serve
+" |  crontab -
+#restart cron to make this job take effect
+service cron restart

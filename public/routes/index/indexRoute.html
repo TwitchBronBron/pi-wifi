@@ -1,0 +1,28 @@
+<h1>Index!</h1>
+<p ng-if="vm.error" style="color: red">{{vm.error.message}}</p>
+<table class="pure-table pure-table-striped">
+    <thead>
+        <tr>
+            <th>SSID</th>
+            <th>Signal Level</th>
+            <th>Bitrates</th>
+            <th>Is Secure</th>
+            <th>Frequency</th>
+            <th>MAC Address</th>
+            <th>Quality</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="cell in vm.cells">
+            <td>{{cell.ssid}}</td>
+            <td>{{cell.signalLevel}}</td>
+            <td>{{cell.bitrates}}</td>
+            <td>{{cell.isSecure}}</td>
+            <td>{{cell.frequency}}</td>
+            <td>{{cell.mac}}</td>
+            <td>{{cell.quality}}</td>
+            <td><button ng-click="vm.connect(cell)">Connect</button></td>
+        </tr>
+    </tbody>
+</table>
