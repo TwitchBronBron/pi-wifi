@@ -20,6 +20,10 @@ class IndexRoute {
             this.error = e.data ?? e;
         });
     }
+
+    setPskForMacAddress(macAddress) {
+
+    }
 }
 
 angular.module('app').component('indexRoute', {

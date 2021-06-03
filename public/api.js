@@ -9,6 +9,10 @@ angular.module('app').factory('api', function ($http) {
         connect(ssid, password) {
             return $http.post('/api/connect', undefined, { params: { ssid: ssid, password: password } });
         }
+
+        setPskForMacAddress(macAddress, psk) {
+            return $http.post('/api/config/psk', undefined, { params: { macAddress: macAddress, psk: psk } });
+        }
     }
     return new ApiService();
 });

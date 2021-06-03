@@ -2,8 +2,14 @@ import fastify from 'fastify';
 import fastifyStatic from 'fastify-static';
 import path from 'path';
 import lib from './lib.mjs';
+import state from './state.mjs';
 
 const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).pathname)));
+const ifaces = {
+    scan: 'wlan0',
+    persistent: 'wlan1',
+    hotspot: 'wlan2'
+};
 
 const app = fastify({ logger: false });
 
@@ -17,11 +23,15 @@ app.get('/api/info', async () => {
 });
 
 app.get('/api/scan', async () => {
-    return await lib.scan();
+    return await lib.scan(ifaces.scan);
 });
 
 app.post('/api/connect', async (request) => {
-    return await lib.connect('wlan0', request.query);
+    return await lib.connect(ifaces.persistent, request.query);
+});
+
+app.post('/api/config/psk', async (request) => {
+    return await state.setPskForMacAddress(request.macAddress, request.psk);
 });
 
 app.listen(3000, '0.0.0.0', (err, address) => {

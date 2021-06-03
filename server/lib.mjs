@@ -3,6 +3,8 @@ import childProcess from 'child_process';
 import { iwlistParse } from './iwlistParse.mjs';
 import fsExtra from 'fs-extra';
 import util from 'util';
+import state from './state.mjs';
+
 const exec = util.promisify(childProcess.exec);
 
 class Lib {
@@ -27,16 +29,22 @@ class Lib {
         return results;
     }
 
-    async scan() {
-        const result = await exec('sudo iwlist wlan2 scan');
-        return iwlistParse(result.stdout);
+    async scan(iface) {
+        const result = await exec(`sudo iwlist ${iface} scan`);
+        const cells = iwlistParse(result.stdout);
+        const config = state.get();
+        //hydrate the cells with any saved wifi passwords
+        for (const cell of cells) {
+            cell.password = config?.pskMap[cell.mac];
+        }
+        return cells;
     }
 
-    async testAll() {
+    async testAll(iface) {
         //find all wifi and keep only the open ones
         var cells = await this.scan();
         var openCells = cells.filter(x => x.encryptionKey.toLowerCase() === 'off');
-        this.test('wlan0', openCells[0].ssid);
+        this.test(iface, openCells[0].ssid);
     }
 
     /**

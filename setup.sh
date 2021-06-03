@@ -107,7 +107,7 @@ sed -i "s/exit 0/cd \/var\/pi-wifi \&\& npm run serve \&\nexit 0/"
 printf "
 #set the path variable
 PATH=$PATH
-@reboot cd /var/pi-wifi && npm run serve
+@reboot cd /var/pi-wifi && npm run serve > /var/log/pi-wifi.log 2>&1
 " |  crontab -
 #restart cron to make this job take effect
 service cron restart

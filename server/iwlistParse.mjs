@@ -42,7 +42,7 @@ export function iwlistParse(str) {
     }
     cells.push(info);
     cells = cells.filter(x => {
-        if (!x.ssid || !x.ssid?.trim() || x.ssid?.toString().includes('\x00')) {
+        if (!x.ssid || !x.ssid?.trim() || x.ssid?.toString().includes('\\x00')) {
             return false;
         } else {
             return true;
