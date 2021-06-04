@@ -1,5 +1,7 @@
 import fsExtra from 'fs-extra';
 import path from 'path';
+import util from './util.mjs';
+
 const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).pathname)));
 const configPath = `${__dirname}/config.json`;
 class State {
@@ -20,6 +22,16 @@ class State {
 
     async get() {
         return this.load();
+    }
+
+    async set(key, value) {
+        await this.load();
+        if (value === undefined) {
+            delete this.config[key];
+        } else {
+            this.config[key] = value;
+        }
+        this.save();
     }
 
     async setPsk(ssid, mac, psk) {
@@ -45,6 +57,34 @@ class State {
         await this.load();
         const result = this.config.passwords?.[key];
         return result;
+    }
+
+    async clearScans() {
+        await this.load();
+        this.config.scans = {};
+    }
+
+    async addScan(cells) {
+        await this.load();
+        this.config.scans = this.config.scans ?? {};
+        for (const cell of cells) {
+            const key = util.getCellKey(cell);
+            const scan = this.config.scans[key] ?? {
+                ...cell,
+                signalLevel: [],
+                quality: []
+            };
+            scan.signalLevel.push(cell.signalLevel);
+            scan.quality.push(cell.quality);
+
+            this.config.scans[key] = scan;
+        }
+        this.save();
+    }
+
+    async getScans() {
+        await this.load();
+        return Object.keys(this.config.scans);
     }
 }
 

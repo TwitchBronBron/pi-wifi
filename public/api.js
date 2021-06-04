@@ -1,6 +1,6 @@
 angular.module('app').factory('api', function ($http) {
     class ApiService {
-        scan() {
+        getScans() {
             return $http.get('/api/scan').then((response) => {
                 return response.data;
             });

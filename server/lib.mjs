@@ -2,10 +2,12 @@ import { networkInterfaces } from 'os';
 import childProcess from 'child_process';
 import { iwlistParse } from './iwlistParse.mjs';
 import fsExtra from 'fs-extra';
-import util from 'util';
+import nodeUtil from 'util';
 import state from './state.mjs';
+import { config } from 'node:process';
+import util from './util.mjs';
 
-const exec = util.promisify(childProcess.exec);
+const exec = nodeUtil.promisify(childProcess.exec);
 
 class Lib {
     /**
@@ -30,15 +32,30 @@ class Lib {
     }
 
     async scan(iface) {
+        console.log("iface!!!!!!!", iface);
         const result = await exec(`sudo iwlist ${iface} scan`);
         const cells = iwlistParse(result.stdout);
-        const config = state.get();
-        //hydrate the cells with any saved wifi passwords
-        for (const cell of cells) {
-            cell.psk = await state.getPsk(cell.ssid, cell.mac);
-        }
-        cells.sort((a, b) => a.ssid.localeCompare(b.ssid));
-        return cells;
+        await state.addScan(cells);
+        // // const config = state.get();
+
+        // //hydrate the cells with additional info
+        // // for (const cell of cells) {
+        // //     cell.psk = await state.getPsk(cell.ssid, cell.mac);
+        // //     cell.isActive = cell.ssid === config.activeSSID;
+        // // }
+        // cells.sort((a, b) => a.ssid.localeCompare(b.ssid));
+        // return cells;
+    }
+
+    async getScans() {
+        return state.getScans();
+
+        // // hydrate the cells with additional info
+        // for (const cell of cells) {
+        //     cell.psk = await state.getPsk(cell.ssid, cell.mac);
+        //     cell.isActive = cell.ssid === config.activeSSID;
+        // }
+        // cells.sort((a, b) => a.ssid.localeCompare(b.ssid));
     }
 
     async testAll(iface) {
@@ -68,8 +85,9 @@ class Lib {
             //set the wifi password if we have it
             var passwordLines = `psk="${password}"`;
         }
+        state.set('activeSSID', ssid);
         await fsExtra.outputFile(`/etc/wpa_supplicant/wpa_supplicant-${iface}.conf`,
-            this.trimLines(`
+            util.trimLines(`
                 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
                 update_config=1
                 country=US
@@ -83,11 +101,6 @@ class Lib {
         await exec(`wpa_cli -i ${iface} reconfigure || ( systemctl restart dhcpcd; wpa_cli -i ${iface} reconfigure; )`);
         return 'done';
     }
-
-    trimLines(text) {
-        return text.split(/[\r\n]/g).map(x => x.trim()).join('\n');
-    }
-
 }
 const lib = new Lib();
 export default lib;

@@ -51,6 +51,8 @@ export function iwlistParse(str) {
 
     cells.forEach((cell) => {
         cell.isSecure = cell.encryptionKey?.toLowerCase() === 'on';
+        cell.channel = /\(channel\s+(\d+)/i.exec(cell.frequency)?.[1];
+        cell.frequency = /(\d+\.\d+\s*\w+)/.exec(cell.frequency)?.[1] ?? cell.frequency;
     });
     return cells;
 }

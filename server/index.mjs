@@ -22,8 +22,8 @@ app.get('/api/info', async () => {
     return lib.getIpAddresses();
 });
 
-app.get('/api/scan', async () => {
-    return await lib.scan(ifaces.scan);
+app.get('/api/scans', async () => {
+    return await lib.getScans();
 });
 
 app.post('/api/connect', async (request) => {
@@ -37,5 +37,13 @@ app.post('/api/psk', async (request) => {
 });
 
 app.listen(3000, '0.0.0.0', (err, address) => {
+    //run scans at regular interval to get a better long-term picture of network quality
+    setInterval(async () => {
+        console.log('starting scan');
+        await lib.scan(ifaces.scan);
+        console.log('Scan complete');
+    }, 5000);
+    lib.scan(ifaces.scan);
+
     if (err) throw err;
 })

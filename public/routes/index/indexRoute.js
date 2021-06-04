@@ -1,7 +1,11 @@
 class IndexRoute {
-    constructor(api, $scope) {
+    constructor(api, $scope, $interval) {
         this.api = api;
         this.$scope = $scope;
+        //refresh the page regularly to get latest scan data
+        $interval(() => {
+            this.load();
+        }, 1000);
         this.load();
     }
 
@@ -11,7 +15,7 @@ class IndexRoute {
 
     load() {
         delete this.error;
-        this.api.scan().then((cells) => {
+        this.api.getScans().then((cells) => {
             this.cells = cells;
         }).catch(this.handleError);
     }

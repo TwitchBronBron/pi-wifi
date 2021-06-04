@@ -4,7 +4,7 @@
   "description": "This is a Raspberry PI project that scans nearby wifi access points, and regularly picks the strongest signal. I created this to solve the very specific purpose of getting more stable wifi in the campground where we vacation every summer.",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon ./server/index.mjs"
+    "serve": "nodemon ./server/index.mjs --ignore ./server/config.json"
   },
   "dependencies": {
     "fastify": "^3.17.0",
