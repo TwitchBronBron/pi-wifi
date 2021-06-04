@@ -81,13 +81,65 @@ enabled = true
 
 service fail2ban restart
 
-#install the pip python package manager
-apt-get install python-pip -y
-#install the ookla speedtest cli
-pip install
+#
+# Install access point and network management software
+#
+apt-get install hostapd -y
+#enable the access point service and set it to start when the pi boots
+systemctl unmask hostapd
+systemctl enable hostapd
+#install dns/dhcp package
+apt-get install dnsmasq -y
+#install firewall/iptable packages
+sudo DEBIAN_FRONTEND=noninteractive apt install -y netfilter-persistent iptables-persistent
+#configure a static ip address for our access point iface (wlan2)
+printf "
+interface wlan2
+    static ip_address=192.168.4.1/24
+    nohook wpa_supplicant
+" >> /etc/dhcpcd.conf
+#enable routing and ip masquerading
+printf "
+# Enable IPv4 routing
+net.ipv4.ip_forward=1
+" > /etc/sysctl.d/routed-ap.conf
+#set firewall rule for nat towards the lan and
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE
+#save the current firewall rules so they're loaded on boot
+netfilter-persistent save
+#configure dhcp/dns services for wifi access point
+mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+printf "
+# Listening interface
+interface=wlan2
+# Pool of IP addresses served via DHCP
+dhcp-range=192.168.4.100,192.168.4.200,255.255.255.0,24h
+# Local wireless DNS domain
+domain=wlan
+# Alias for this router
+address=/gw.wlan/192.168.4.1
+" > /etc/dnsmasq.conf
+#ensure wifi not blocked
+rfkill unblock wlan
+#configure the access point
+printf "
+country_code=US
+interface=wlan2
+ssid=pi-wifi
+hw_mode=g
+channel=7
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=raspberry
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+" > /etc/hostapd/hostapd.conf
 
-
-#download the pi-wifi project
+#download the pi-wifi admin panel project
 #TODO
 cd /var/pi-wifi
 
