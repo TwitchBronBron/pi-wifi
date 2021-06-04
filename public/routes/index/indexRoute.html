@@ -4,13 +4,13 @@
     <thead>
         <tr>
             <th>SSID</th>
-            <th>Signal Level</th>
-            <th>Bitrates</th>
-            <th>Frequency</th>
             <th>Channel</th>
+            <th>Signal Level (avg)</th>
+            <th>Quality (avg)</th>
+            <th>Frequency</th>
             <th>MAC Address</th>
-            <th>Quality</th>
             <th>Is Secure</th>
+            <th>Bitrates</th>
             <th>Password</th>
             <th></th>
         </tr>
@@ -18,13 +18,13 @@
     <tbody>
         <tr ng-repeat="cell in vm.cells">
             <td>{{cell.ssid}}</td>
-            <td>{{cell.signalLevel}}</td>
-            <td>{{cell.bitrates}}</td>
-            <td>{{cell.frequency}}</td>
             <td>{{cell.channel}}</td>
-            <td>{{cell.mac}}</td>
+            <td>{{cell.signalLevel}}</td>
             <td>{{cell.quality}}</td>
+            <td>{{cell.frequency}}</td>
+            <td>{{cell.mac}}</td>
             <td>{{cell.isSecure}}</td>
+            <td>{{cell.bitrates}}</td>
             <td ng-class="{pointer: cell.isSecure}" ng-click="vm.setPsk(cell)">{{cell.psk}}</td>
             <td><button ng-click="vm.connect(cell)">Connect</button></td>
         </tr>

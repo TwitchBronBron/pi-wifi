@@ -32,7 +32,6 @@ class Lib {
     }
 
     async scan(iface) {
-        console.log("iface!!!!!!!", iface);
         const result = await exec(`sudo iwlist ${iface} scan`);
         const cells = iwlistParse(result.stdout);
         await state.addScan(cells);

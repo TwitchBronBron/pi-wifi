@@ -13,10 +13,22 @@ class IndexRoute {
         this.error = err?.data ?? e;
     };
 
+    average(values) {
+        var total = 0;
+        for (var i = 0; i < values.length; i++) {
+            total += values[i];
+        }
+        return total / values.length;
+    }
+
     load() {
         delete this.error;
         this.api.getScans().then((cells) => {
             this.cells = cells;
+            for (const cell of this.cells) {
+                cell.signalLevel = parseInt(this.average(cell.signalLevel));
+                cell.quality = parseInt(this.average(cell.quality));
+            }
         }).catch(this.handleError);
     }
 

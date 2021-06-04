@@ -1,7 +1,7 @@
 angular.module('app').factory('api', function ($http) {
     class ApiService {
         getScans() {
-            return $http.get('/api/scan').then((response) => {
+            return $http.get('/api/scans').then((response) => {
                 return response.data;
             });
         }

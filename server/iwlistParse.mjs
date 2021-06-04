@@ -53,6 +53,9 @@ export function iwlistParse(str) {
         cell.isSecure = cell.encryptionKey?.toLowerCase() === 'on';
         cell.channel = /\(channel\s+(\d+)/i.exec(cell.frequency)?.[1];
         cell.frequency = /(\d+\.\d+\s*\w+)/.exec(cell.frequency)?.[1] ?? cell.frequency;
+        cell.signalLevel = parseFloat(cell.signalLevel);
+        const qualityChunks = cell.quality.split('/');
+        cell.quality = parseInt((parseInt(qualityChunks[0]) / parseInt(qualityChunks[1])) * 10000) / 100;
     });
     return cells;
 }

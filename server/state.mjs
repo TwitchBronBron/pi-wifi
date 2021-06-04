@@ -84,7 +84,7 @@ class State {
 
     async getScans() {
         await this.load();
-        return Object.keys(this.config.scans);
+        return Object.values(this.config.scans);
     }
 }
 
