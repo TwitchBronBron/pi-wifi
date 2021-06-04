@@ -35,8 +35,9 @@ class Lib {
         const config = state.get();
         //hydrate the cells with any saved wifi passwords
         for (const cell of cells) {
-            cell.password = config?.pskMap[cell.mac];
+            cell.psk = await state.getPsk(cell.ssid, cell.mac);
         }
+        cells.sort((a, b) => a.ssid.localeCompare(b.ssid));
         return cells;
     }
 

@@ -5,10 +5,15 @@ class IndexRoute {
         this.load();
     }
 
+    handleError = (err) => {
+        this.error = err?.data ?? e;
+    };
+
     load() {
+        delete this.error;
         this.api.scan().then((cells) => {
             this.cells = cells;
-        });
+        }).catch(this.handleError);
     }
 
     connect(cell) {
@@ -16,13 +21,17 @@ class IndexRoute {
         if (cell.isSecure) {
             var password = prompt('Please enter the password for this secure wifi network');
         }
-        this.api.connect(cell.ssid, password).catch((e) => {
-            this.error = e.data ?? e;
-        });
+        this.api.connect(cell.ssid, password).catch(this.handleError);
     }
 
-    setPskForMacAddress(macAddress) {
-
+    async setPsk(cell) {
+        delete this.error;
+        if (cell.isSecure) {
+            var psk = prompt('Please enter the wifi password (leave empty to delete)');
+            return this.api.setPsk(cell.ssid, cell.mac, psk).then(() => {
+                cell.psk = psk;
+            }).catch(this.handleError);
+        }
     }
 }
 

@@ -27,11 +27,13 @@ app.get('/api/scan', async () => {
 });
 
 app.post('/api/connect', async (request) => {
-    return await lib.connect(ifaces.persistent, request.query);
+    await lib.connect(ifaces.persistent, request.query);
+    return 'ok';
 });
 
-app.post('/api/config/psk', async (request) => {
-    return await state.setPskForMacAddress(request.macAddress, request.psk);
+app.post('/api/psk', async (request) => {
+    await state.setPsk(request.query.ssid, request.query.mac, request.query.psk);
+    return 'ok';
 });
 
 app.listen(3000, '0.0.0.0', (err, address) => {
