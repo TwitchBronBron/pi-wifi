@@ -6,7 +6,7 @@ const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).p
 const configPath = `${__dirname}/config.json`;
 class State {
     async save() {
-        return fsExtra.outputJson(configPath, this.config);
+        await fsExtra.outputJson(configPath, this.config);
     }
 
     async load() {
@@ -61,7 +61,8 @@ class State {
 
     async clearScans() {
         await this.load();
-        this.config.scans = {};
+        this.config.scans = undefined;
+        // await this.save();
     }
 
     async addScan(cells) {
@@ -84,7 +85,14 @@ class State {
 
     async getScans() {
         await this.load();
-        return Object.values(this.config.scans);
+        return Object.values(this.config.scans ?? {});
+    }
+
+    async clearScans() {
+        if (this.config) {
+            this.config.scans = {};
+        }
+        await this.save();
     }
 }
 

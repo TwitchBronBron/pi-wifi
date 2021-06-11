@@ -26,6 +26,11 @@ app.get('/api/scans', async () => {
     return await lib.getScans();
 });
 
+app.delete('/api/scans', async () => {
+    await state.clearScans();
+    return 'ok';
+});
+
 app.post('/api/connect', async (request) => {
     await lib.connect(ifaces.persistent, request.query);
     return 'ok';
@@ -36,12 +41,12 @@ app.post('/api/psk', async (request) => {
     return 'ok';
 });
 
-app.listen(3000, '0.0.0.0', (err, address) => {
+app.listen(80, '0.0.0.0', (err, address) => {
     //run scans at regular interval to get a better long-term picture of network quality
     setInterval(async () => {
-        console.log('starting scan');
-        await lib.scan(ifaces.scan);
-        console.log('Scan complete');
+        // console.log('starting scan');
+        // await lib.scan(ifaces.scan);
+        // console.log('Scan complete');
     }, 5000);
     lib.scan(ifaces.scan);
 

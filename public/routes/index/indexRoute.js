@@ -2,10 +2,11 @@ class IndexRoute {
     constructor(api, $scope, $interval) {
         this.api = api;
         this.$scope = $scope;
+        this.isLoading = false;
         //refresh the page regularly to get latest scan data
         $interval(() => {
             this.load();
-        }, 1000);
+        }, 5000);
         this.load();
     }
 
@@ -23,13 +24,15 @@ class IndexRoute {
 
     load() {
         delete this.error;
+        this.isLoading = true;
         this.api.getScans().then((cells) => {
             this.cells = cells;
             for (const cell of this.cells) {
+                cell.scanCount = cell.signalLevel.length;
                 cell.signalLevel = parseInt(this.average(cell.signalLevel));
                 cell.quality = parseInt(this.average(cell.quality));
             }
-        }).catch(this.handleError);
+        }).catch(this.handleError).then(() => this.isLoading = false);
     }
 
     connect(cell) {
@@ -40,7 +43,7 @@ class IndexRoute {
         this.api.connect(cell.ssid, password).catch(this.handleError);
     }
 
-    async setPsk(cell) {
+    setPsk(cell) {
         delete this.error;
         if (cell.isSecure) {
             var psk = prompt('Please enter the wifi password (leave empty to delete)');
@@ -48,6 +51,13 @@ class IndexRoute {
                 cell.psk = psk;
             }).catch(this.handleError);
         }
+    }
+
+    clearScans() {
+        delete this.error;
+        this.api.clearScans().catch(this.handleError).then(() => {
+            this.load();
+        });
     }
 }
 

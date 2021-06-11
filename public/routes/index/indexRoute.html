@@ -1,5 +1,7 @@
 <h1>Index!</h1>
 <p ng-if="vm.error" style="color: red">{{vm.error.message}}</p>
+<button ng-click="vm.clearScans()">Clear scans</button>
+<span ng-show="vm.isLoading">Loading...</span>
 <table class="pure-table pure-table-striped">
     <thead>
         <tr>
@@ -12,11 +14,12 @@
             <th>Is Secure</th>
             <th>Bitrates</th>
             <th>Password</th>
+            <th title="The number of times the wifi card has scanned and found this network">Scan count</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="cell in vm.cells">
+        <tr ng-repeat="cell in vm.cells | orderBy: '-signalLevel'">
             <td>{{cell.ssid}}</td>
             <td>{{cell.channel}}</td>
             <td>{{cell.signalLevel}}</td>
@@ -26,6 +29,7 @@
             <td>{{cell.isSecure}}</td>
             <td>{{cell.bitrates}}</td>
             <td ng-class="{pointer: cell.isSecure}" ng-click="vm.setPsk(cell)">{{cell.psk}}</td>
+            <td>{{cell.scanCount}}</td>
             <td><button ng-click="vm.connect(cell)">Connect</button></td>
         </tr>
     </tbody>

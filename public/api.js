@@ -6,6 +6,12 @@ angular.module('app').factory('api', function ($http) {
             });
         }
 
+        clearScans() {
+            return $http.delete('/api/scans').then((response) => {
+                return response.data;
+            });
+        }
+
         connect(ssid, password) {
             return $http.post('/api/connect', undefined, { params: { ssid: ssid, password: password } });
         }
