@@ -10,12 +10,12 @@ class State {
     }
 
     async load() {
-        if (!this.config) {
-            if (!await fsExtra.pathExists(configPath)) {
-                this.config = {};
-            } else {
-                this.config = await fsExtra.readJson(configPath);
-            }
+        try {
+            this.config = await fsExtra.readJson(configPath);
+        } catch (e) {
+            //if the loading fails for any reason, log the error and start from scratch
+            console.error(e);
+            this.config = {};
         }
         return this.config;
     }
