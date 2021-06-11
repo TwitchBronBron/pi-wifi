@@ -2,6 +2,8 @@ import fsExtra from 'fs-extra';
 import path from 'path';
 import util from './util.mjs';
 
+const maxCellCount = 50;
+
 const __dirname = path.resolve(path.dirname(decodeURI(new URL(import.meta.url).pathname)));
 const configPath = `${__dirname}/config.json`;
 class State {
@@ -75,6 +77,11 @@ class State {
                 signalLevel: [],
                 quality: []
             };
+            //only keep a certain amount of scan info
+            if (scan.signalLevel.length >= maxCellCount) {
+                scan.signalLevel.shift();
+                scan.quality.shift();
+            }
             scan.signalLevel.push(cell.signalLevel);
             scan.quality.push(cell.quality);
 
